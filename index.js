@@ -6,7 +6,7 @@ var spawn = require('child_process').spawn,
       'relative': true,
       'css': 'stylesheets',
       'sass': 'stylesheets',
-      'project': path.join(__dirname, 'public')
+      'project': path.join(process.cwd(), 'public')
     };
 
 module.exports = exports = function(opts) {
