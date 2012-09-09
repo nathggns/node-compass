@@ -1,0 +1,15 @@
+{
+  "name": "node-compass",
+  "version": "0.0.1",
+  "description": "compass middleware",
+  "homepage": "https://github.com/nathggns/node-compass",
+  "author": {
+    "name": "Nathaniel Higgins",
+    "email": "nat@nath.is"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nathggns/node-compass.git"
+  },
+  "main": "index.js"
+}
