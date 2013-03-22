@@ -18,6 +18,9 @@ module.exports = exports = function(opts) {
   }
 
   return function(req, res, next) {
+
+    if (last(req.path.split('.')) !== 'css') return next();
+
     var compass = spawn(
       'compass',
       [
