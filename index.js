@@ -6,7 +6,8 @@ var spawn = require('child_process').spawn,
       'relative': true,
       'css': 'stylesheets',
       'sass': 'stylesheets',
-      'project': path.join(process.cwd(), 'public')
+      'project': path.join(process.cwd(), 'public'),
+      'cache': true
     },
     fs = require('fs');
 
@@ -89,66 +90,70 @@ module.exports = exports = function(opts) {
     var go = false;
     var exit = false;
 
-    var getStatFunction = function(key, item, done) {
-      return function(err, stats) {
+    if (!opts.cache) {
+      go = true;
+    } else {
+      var getStatFunction = function(key, item, done) {
+        return function(err, stats) {
 
-        if (err) {
-          delete cache[key];
-        } else if (item.mtime !== stats.mtime.getTime()) {
-          changes = true;
-        }
+          if (err) {
+            delete cache[key];
+          } else if (item.mtime !== stats.mtime.getTime()) {
+            changes = true;
+          }
 
-        if (done) done();
-      };
-    };
-
-    fs.readdir(path.join(opts.project, opts.sass), function(err, files) {
-
-      var count = 0;
-
-      if (sassCount !== null) {
-
-        for (var key in files) {
-          var file = files[key];
-
-          if (['sass', 'scss'].indexOf(last(file.split('.'))) !== -1) count++;
-        }
-      }
-
-      if (count !== sassCount) {
-        changes = true;
-        go = true;
-      } else {
-        var need = Object.keys(cache).length;
-        var done = 0;
-
-        var doneFunction = function() {
-          done++;
+          if (done) done();
         };
+      };
 
-        for (var cacheKey in cache) {
-          var item = cache[cacheKey];
+      fs.readdir(path.join(opts.project, opts.sass), function(err, files) {
 
-          try {
-            fs.stat(item.sass, getStatFunction(cacheKey, item, doneFunction));
-          } catch (e) {
-            delete cache[cacheKey];
-            doneFunction();
+        var count = 0;
+
+        if (sassCount !== null) {
+
+          for (var key in files) {
+            var file = files[key];
+
+            if (['sass', 'scss'].indexOf(last(file.split('.'))) !== -1) count++;
           }
         }
 
-        (function waiting() {
-          if (done < need) return setTimeout(waiting, 1);
+        if (count !== sassCount) {
+          changes = true;
+          go = true;
+        } else {
+          var need = Object.keys(cache).length;
+          var done = 0;
 
-          if (!changes) {
-            exit = true;
-          } else {
-            go = true;
+          var doneFunction = function() {
+            done++;
+          };
+
+          for (var cacheKey in cache) {
+            var item = cache[cacheKey];
+
+            try {
+              fs.stat(item.sass, getStatFunction(cacheKey, item, doneFunction));
+            } catch (e) {
+              delete cache[cacheKey];
+              doneFunction();
+            }
           }
-        })();
 
-      }
-    });
+          (function waiting() {
+            if (done < need) return setTimeout(waiting, 1);
+
+            if (!changes) {
+              exit = true;
+            } else {
+              go = true;
+            }
+          })();
+
+        }
+      });
+    }
 
     (function waitingForGo() {
       if (!go) {
@@ -176,33 +181,35 @@ module.exports = exports = function(opts) {
         }
       );
 
-      fs.readdir(path.join(opts.project, opts.css), function(err, files) {
+      if (opts.cache) {
+        fs.readdir(path.join(opts.project, opts.css), function(err, files) {
 
-        var done = 0;
+          var done = 0;
 
-        var doneFunction = function() {
-          done++;
-        };
+          var doneFunction = function() {
+            done++;
+          };
 
-        var need = 0;
+          var need = 0;
 
-        for (var key in files) {
-          var file = files[key];
+          for (var key in files) {
+            var file = files[key];
 
-          if (last(file.split('.')) === 'css') {
-            need++;
-            var full = path.join(path.join(opts.project, opts.sass), file);
+            if (last(file.split('.')) === 'css') {
+              need++;
+              var full = path.join(path.join(opts.project, opts.sass), file);
 
-            fs.readFile(full, getCSSFunction(full, doneFunction));
+              fs.readFile(full, getCSSFunction(full, doneFunction));
+            }
           }
-        }
 
-        (function waiting() {
-          if (done < need) return setTimeout(waiting, 1);
+          (function waiting() {
+            if (done < need) return setTimeout(waiting, 1);
 
-          fillInSassFiles();
-        })();
-      });
+            fillInSassFiles();
+          })();
+        });
+      }
 
       compass.on('exit', function(code) {
         return next();
