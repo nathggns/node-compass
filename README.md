@@ -79,3 +79,8 @@ Can be expanded, nested, compressed or compact.
 
 **default:** public
 **description:** The location where all your assets are store.
+
+#### cache
+
+**default:** true
+**description:** enable/disable caching.
