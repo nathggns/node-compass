@@ -52,35 +52,42 @@ compass({
 #### mode
 
 **default:** compress
+
 **description:** The output mode you wish to use.
 Can be expanded, nested, compressed or compact.
 
 #### comments
 
 **default:** false
+
 **descrption:** Show line comments or not.
 
 #### relative
 
 **default:** true
+
 **description:** Are assets relative.
 
 #### css
 
 **default:** stylesheets
+
 **description:** The folder inside the project to output css into.
 
 #### sass
 
 **default:** stylesheets
+
 **description:** The folder inside the project to find sass in.
 
-### project
+#### project
 
 **default:** public
+
 **description:** The location where all your assets are store.
 
 #### cache
 
 **default:** true
+
 **description:** enable/disable caching.
