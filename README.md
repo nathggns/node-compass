@@ -60,7 +60,7 @@ Can be expanded, nested, compressed or compact.
 
 **default:** false
 
-**descrption:** Show line comments or not.
+**description:** Show line comments or not.
 
 #### relative
 
