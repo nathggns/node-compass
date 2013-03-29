@@ -161,8 +161,6 @@ module.exports = exports = function(opts) {
 
       cache = {};
 
-      console.log('compiling');
-
       var compass = spawn(
         'compass',
         [
