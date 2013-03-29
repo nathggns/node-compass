@@ -1,12 +1,23 @@
 node-compass
 ============
 
-Compass middleware for node.js.
+Compass middleware for node.js & express.
+
+## Requirements
+
+`node-compass` requires the compass ruby gem in order to compile compass.
+This can easily be installed via Terminal.
+    
+    $ gem update --system
+    $ gem install compass
+
+You'll want to do that as a root user.
+
+[More Info](http://compass-style.org/install/)
 
 ## Installation
 
     npm install node-compass
-
 
 ## Usage
 
@@ -36,4 +47,35 @@ compass({
 });
 ```
 
-For further configuation options, please browse the source.
+### Configuration Options
+
+#### mode
+
+**default:** compress
+**description:** The output mode you wish to use.
+Can be expanded, nested, compressed or compact.
+
+#### comments
+
+**default:** false
+**descrption:** Show line comments or not.
+
+#### relative
+
+**default:** true
+**description:** Are assets relative.
+
+#### css
+
+**default:** stylesheets
+**description:** The folder inside the project to output css into.
+
+#### sass
+
+**default:** stylesheets
+**description:** The folder inside the project to find sass in.
+
+### project
+
+**default:** public
+**description:** The location where all your assets are store.
