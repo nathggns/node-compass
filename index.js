@@ -166,20 +166,46 @@ module.exports = exports = function(opts) {
 
       cache = {};
 
+      var options = [];
+
+      options.push('compile');
+
+      if (!opts.comments) {
+        options.push('--no-line-comments');
+      }
+
+      if (opts.relative) {
+        options.push('--relative-assets');
+      }
+
+      options.push('--output-style', opts.mode);
+      
+      if (!opts.cache) {
+       options.push('--force');
+      }
+
+      options.push('--css-dir', opts.css);
+      options.push('--sass-dir', opts.sass);  
+
       var compass = spawn(
         'compass',
-        [
-          'compile',
-          opts.comments ? '' : '--no-line-comments',
-          opts.relative ? '--relative-assets' : '',
-          '-s', opts.mode,
-          '--css-dir', opts.css,
-          '--sass-dir', opts.sass
-        ],
+        options,
         {
           cwd: opts.project
         }
       );
+
+      compass.stdout.setEncoding('utf8');
+      compass.stdout.on('data', function (data) {
+        console.log(data);
+      });
+    
+      compass.stderr.setEncoding('utf8');
+      compass.stderr.on('data', function (data) {
+        if (!data.match(/^\u001b\[\d+m$/)) {
+          console.error('\u001b[31mstderr:\u001b[0m ' + data);
+        }
+      });
 
       if (opts.cache) {
         fs.readdir(path.join(opts.project, opts.css), function(err, files) {
