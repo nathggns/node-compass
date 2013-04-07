@@ -179,11 +179,6 @@ module.exports = exports = function(opts) {
       }
 
       options.push('--output-style', opts.mode);
-      
-      if (!opts.cache) {
-       options.push('--force');
-      }
-
       options.push('--css-dir', opts.css);
       options.push('--sass-dir', opts.sass);  
 
