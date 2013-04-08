@@ -96,4 +96,4 @@ Can be expanded, nested, compressed or compact.
 
 **default:** false
 
-**description:** Enable/disables logging to terminal when attempting to compule sass files.
+**description:** Enable/disables logging to terminal when attempting to compile sass files.
