@@ -7,7 +7,8 @@ var spawn = require('child_process').spawn,
       'css': 'stylesheets',
       'sass': 'stylesheets',
       'project': path.join(process.cwd(), 'public'),
-      'cache': true
+      'cache': true,
+      'logging': false
     },
     fs = require('fs');
 
@@ -170,20 +171,10 @@ module.exports = exports = function(opts) {
 
       options.push('compile');
 
-      if (!opts.comments) {
-        options.push('--no-line-comments');
-      }
-
-      if (opts.relative) {
-        options.push('--relative-assets');
-      }
+      if (!opts.comments) { options.push('--no-line-comments'); }
+      if (opts.relative) { options.push('--relative-assets'); }
 
       options.push('--output-style', opts.mode);
-      
-      if (!opts.cache) {
-       options.push('--force');
-      }
-
       options.push('--css-dir', opts.css);
       options.push('--sass-dir', opts.sass);  
 
@@ -195,17 +186,19 @@ module.exports = exports = function(opts) {
         }
       );
 
-      compass.stdout.setEncoding('utf8');
-      compass.stdout.on('data', function (data) {
-        console.log(data);
-      });
-    
-      compass.stderr.setEncoding('utf8');
-      compass.stderr.on('data', function (data) {
-        if (!data.match(/^\u001b\[\d+m$/)) {
-          console.error('\u001b[31mstderr:\u001b[0m ' + data);
-        }
-      });
+      if (opts.logging) {
+        compass.stdout.setEncoding('utf8');
+        compass.stdout.on('data', function (data) {
+          console.log(data);
+        });
+      
+        compass.stderr.setEncoding('utf8');
+        compass.stderr.on('data', function (data) {
+          if (!data.match(/^\u001b\[\d+m$/)) {
+            console.error('\u001b[31mstderr:\u001b[0m ' + data);
+          }
+        });
+      }
 
       if (opts.cache) {
         fs.readdir(path.join(opts.project, opts.css), function(err, files) {
