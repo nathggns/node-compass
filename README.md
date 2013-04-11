@@ -91,3 +91,9 @@ Can be expanded, nested, compressed or compact.
 **default:** true
 
 **description:** enable/disable caching.
+
+#### logging
+
+**default:** false
+
+**description:** Enable/disables logging to terminal when attempting to compile sass files.
