@@ -4,10 +4,14 @@ var spawn = require('child_process').spawn,
       'mode': 'compress',
       'comments': false,
       'relative': true,
+      'img': 'images',
       'css': 'stylesheets',
       'sass': 'stylesheets',
       'project': path.join(process.cwd(), 'public'),
-      'cache': true
+      'cache': true,
+      'libs': [],
+      'config': false,
+      'debug': false
     },
     fs = require('fs');
 
@@ -166,13 +170,32 @@ module.exports = exports = function(opts) {
 
       cache = {};
 	  
-	  var args = ['compile', '-s', opts.mode, '--css-dir', opts.css, '--sass-dir', opts.sass]
+	  var args = ['compile'];
 	  
-	  !opts.comments && (args.push("--no-line-comments"));
+	  if(opts.config_file){
+		  args.push('-c', opts.config_file);
+	  }else{
+		  args.push('-s', opts.mode);
+		  args.push('--css-dir', opts.css);
+		  args.push('--sass-dir', opts.sass);
+		  args.push('--images-dir', opts.img);
+		  if(Array.isArray(opts.libs) && opts.libs.length){
+			  opts.libs.forEach(function(lib){
+				  args.push('-r', lib);
+			  });
+		  }
+		  !opts.comments && (args.push("--no-line-comments"));
+		  opts.relative && (args.push("--relative-assets"));
+	  }
 	  
-	  opts.relative && (args.push("--relative-assets"));
+	  var compass = spawn('compass', args, {cwd: opts.project});
 	  
-      var compass = spawn('compass', args, {cwd: opts.project});
+	  if(opts.debug){
+		console.log("(" + opts.project + ")",  "compass", args.join(" "));
+		compass.stdout.on("data", function(data){process.stdout.write((new Buffer(data)).toString("utf8"));});
+		compass.stderr.on("data", function(data){process.stdout.write((new Buffer(data)).toString("utf8"));});
+	  }
+	  
 
       if (opts.cache) {
         fs.readdir(path.join(opts.project, opts.css), function(err, files) {
