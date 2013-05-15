@@ -165,21 +165,14 @@ module.exports = exports = function(opts) {
       }
 
       cache = {};
-
-      var compass = spawn(
-        'compass',
-        [
-          'compile',
-          opts.comments ? '' : '--no-line-comments',
-          opts.relative ? '--relative-assets' : '',
-          '-s', opts.mode,
-          '--css-dir', opts.css,
-          '--sass-dir', opts.sass
-        ],
-        {
-          cwd: opts.project
-        }
-      );
+	  
+	  var args = ['compile', '-s', opts.mode, '--css-dir', opts.css, '--sass-dir', opts.sass]
+	  
+	  !opts.comments && (args.push("--no-line-comments"));
+	  
+	  opts.relative && (args.push("--relative-assets"));
+	  
+      var compass = spawn('compass', args, {cwd: opts.project});
 
       if (opts.cache) {
         fs.readdir(path.join(opts.project, opts.css), function(err, files) {
