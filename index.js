@@ -164,6 +164,7 @@ module.exports = exports = function(opts) {
         if (!exit) {
           return setTimeout(waitingForGo, 1);
         } else {
+          opts.debug && console.log("Compass CSS From Cache");
           return next();
         }
       }
