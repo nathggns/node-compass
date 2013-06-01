@@ -6,9 +6,12 @@ var spawn = require('child_process').spawn,
       'relative': true,
       'css': 'stylesheets',
       'sass': 'stylesheets',
+      'img': 'images',
       'project': path.join(process.cwd(), 'public'),
       'cache': true,
-      'logging': false
+      'logging': false,
+      'libs': [],
+      'config_file': false
     },
     fs = require('fs');
 
@@ -170,22 +173,30 @@ module.exports = exports = function(opts) {
       var options = [];
 
       options.push('compile');
+	  
+      if (opts.config_file) {
+        options.push('-c', opts.config_file);
+      } else {
+        if (!opts.comments) { options.push('--no-line-comments'); }
+        if (opts.relative) { options.push('--relative-assets'); }
 
-      if (!opts.comments) { options.push('--no-line-comments'); }
-      if (opts.relative) { options.push('--relative-assets'); }
-
-      options.push('--output-style', opts.mode);
-      options.push('--css-dir', opts.css);
-      options.push('--sass-dir', opts.sass);  
-
-      var compass = spawn(
-        'compass',
-        options,
-        {
-          cwd: opts.project
+        options.push('--output-style', opts.mode);
+        options.push('--css-dir', opts.css);
+        options.push('--sass-dir', opts.sass);  
+        options.push('--images-dir', opts.img);
+        if(Array.isArray(opts.libs) && opts.libs.length){
+          opts.libs.forEach(function(lib){
+            options.push('-r', lib);
+          });
         }
-      );
-
+        var compass = spawn(
+          'compass',
+          options,
+          {
+            cwd: opts.project
+          }
+        );
+      }
       if (opts.logging) {
         compass.stdout.setEncoding('utf8');
         compass.stdout.on('data', function (data) {
