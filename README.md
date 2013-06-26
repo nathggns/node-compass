@@ -30,6 +30,10 @@ app.configure(function() {
 });
 ```
 
+## Changelog
+
+[**View Changelog**](Changelog.md)
+
 ## Configuration
 
 `node-compass` is highly configurable.
@@ -97,3 +101,9 @@ Can be expanded, nested, compressed or compact.
 **default:** false
 
 **description:** Enable/disables logging to terminal when attempting to compile sass files.
+
+#### config_file
+
+**default:** false
+
+**description:** Use this config option to point to a valid compass `config.rb` file, if you would prefer to use that for your config instead.
