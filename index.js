@@ -189,14 +189,16 @@ module.exports = exports = function(opts) {
             options.push('-r', lib);
           });
         }
-        var compass = spawn(
-          'compass',
-          options,
-          {
-            cwd: opts.project
-          }
-        );
       }
+
+      var compass = spawn(
+        'compass',
+        options,
+        {
+          cwd: opts.project
+        }
+      );
+
       if (opts.logging) {
         compass.stdout.setEncoding('utf8');
         compass.stdout.on('data', function (data) {
