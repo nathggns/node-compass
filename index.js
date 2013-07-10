@@ -1,4 +1,5 @@
-var spawn = require('child_process').spawn,
+var os = require('os'),
+    spawn = require('child_process').spawn,
     path = require('path'),
     defaults = {
       'mode': 'compress',
@@ -173,7 +174,7 @@ module.exports = exports = function(opts) {
       var options = [];
 
       options.push('compile');
-	  
+
       if (opts.config_file) {
         options.push('-c', opts.config_file);
       } else {
@@ -191,8 +192,13 @@ module.exports = exports = function(opts) {
         }
       }
 
+      var compassExecutable = 'compass';
+      if (os.platform() === 'win32') {
+        compassExecutable += '.bat';
+      }
+
       var compass = spawn(
-        'compass',
+        compassExecutable,
         options,
         {
           cwd: opts.project
