@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.3
+
+ - Added Windows support by concatenating ".bat" to the compass spawn target if we are on Windows. (7b9e00314d80bd50b7f7c28ef6e062698de7224d) (@mpderbec)
+
 ## Version 0.2.2
 
  - Fix fatal bug introduced in `v0.2.1` (419161224f86e6a6c7e1818b71f880286b6da708) (@AndrewHathaway)
