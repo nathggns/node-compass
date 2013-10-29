@@ -71,7 +71,10 @@ module.exports = exports = function(opts) {
         if (['scss', 'sass'].indexOf(last(parts)) === -1) continue;
 
         var name = last(parts[0].split('/'));
+        var includePaths = [ opts.sass ].concat(opts.include_paths || opts.includePaths);
+
         var fullPath = path.join(path.join(opts.project, opts.sass), file);
+
         var cssPath = path.join(path.join(opts.project, opts.css), name) + '.css';
 
         if (!cache[cssPath]) continue;
@@ -183,8 +186,11 @@ module.exports = exports = function(opts) {
 
         options.push('--output-style', opts.mode);
         options.push('--css-dir', opts.css);
-        options.push('--sass-dir', opts.sass);  
+        options.push('--sass-dir', opts.sass);
         options.push('--images-dir', opts.img);
+
+        if (opts.additional_import_paths) { options.push('-I', opts.additional_import_paths); }
+
         if(Array.isArray(opts.libs) && opts.libs.length){
           opts.libs.forEach(function(lib){
             options.push('-r', lib);
@@ -210,7 +216,7 @@ module.exports = exports = function(opts) {
         compass.stdout.on('data', function (data) {
           console.log(data);
         });
-      
+
         compass.stderr.setEncoding('utf8');
         compass.stderr.on('data', function (data) {
           if (!data.match(/^\u001b\[\d+m$/)) {
