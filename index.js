@@ -12,7 +12,8 @@ var os = require('os'),
       'cache': true,
       'logging': false,
       'libs': [],
-      'config_file': false
+      'config_file': false,
+      'import_path': path.join(process.cwd(), 'public')
     },
     fs = require('fs');
 
@@ -185,6 +186,7 @@ module.exports = exports = function(opts) {
         options.push('--css-dir', opts.css);
         options.push('--sass-dir', opts.sass);  
         options.push('--images-dir', opts.img);
+	options.push('-I', opts.import_path);
         if(Array.isArray(opts.libs) && opts.libs.length){
           opts.libs.forEach(function(lib){
             options.push('-r', lib);
