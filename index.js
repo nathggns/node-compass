@@ -176,22 +176,19 @@ module.exports = exports = function(opts) {
 
       options.push('compile');
 
-      if (opts.config_file) {
-        options.push('-c', opts.config_file);
-      } else {
-        if (!opts.comments) { options.push('--no-line-comments'); }
-        if (opts.relative) { options.push('--relative-assets'); }
+      if (opts.config_file) { options.push('-c', opts.config_file); }
+      if (!opts.comments) { options.push('--no-line-comments'); }
+      if (opts.relative) { options.push('--relative-assets'); }
 
-        options.push('--output-style', opts.mode);
-        options.push('--css-dir', opts.css);
-        options.push('--sass-dir', opts.sass);  
-        options.push('--images-dir', opts.img);
-	options.push('-I', opts.import_path);
-        if(Array.isArray(opts.libs) && opts.libs.length){
-          opts.libs.forEach(function(lib){
-            options.push('-r', lib);
-          });
-        }
+      options.push('--output-style', opts.mode);
+      options.push('--css-dir', opts.css);
+      options.push('--sass-dir', opts.sass);  
+      options.push('--images-dir', opts.img);
+      options.push('-I', opts.import_path);
+      if(Array.isArray(opts.libs) && opts.libs.length){
+        opts.libs.forEach(function(lib){
+          options.push('-r', lib);
+        });
       }
 
       var compassExecutable = 'compass';
