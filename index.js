@@ -1,256 +1,231 @@
-var os = require('os'),
-    spawn = require('child_process').spawn,
-    path = require('path'),
-    defaults = {
-      'mode': 'compress',
-      'comments': false,
-      'relative': true,
-      'css': 'stylesheets',
-      'sass': 'stylesheets',
-      'img': 'images',
-      'project': path.join(process.cwd(), 'public'),
-      'cache': true,
-      'logging': false,
-      'libs': [],
-      'config_file': false,
-      'import_path': path.join(process.cwd(), 'public')
-    },
-    fs = require('fs');
+var os    = require('os');
+var spawn = require('child_process').spawn;
+var path  = require('path');
+var fs    = require('fs');
+var _     = require('lodash');
+var Q     = require('q');
 
-module.exports = exports = function(opts) {
-  opts = opts || {};
-  for (var key in defaults) {
-    if (opts[key] === undefined) {
-      opts[key] = defaults[key];
-    }
+/**
+ * An exception that is thrown when the wrong arguments are passed
+ */
+function InvalidArgumentException(message) {
+  this.message = message;
+  this.stack   = (new Error()).stack;
+}
+
+InvalidArgumentException.prototype = new Error();
+
+_.extend(InvalidArgumentException.prototype, {
+  name : 'InvalidArgumentException'
+});
+
+/**
+ * Handle filtering requests to only take requests for CSS files
+ */
+function filterRequest(req) {
+
+  if (typeof req !== 'object' || _.isArray(req)) {
+    throw new InvalidArgumentException('req should be an object');
   }
 
-  var cache = {};
-  var sassCount = null;
+  if (typeof req.path !== 'string') {
+    throw new InvalidArgumentException(
+      'req should have path property, which is of type string'
+    );
+  }
 
-  var getCSSFunction = function(file, done) {
-    return function(err, data) {
-      cache[file] = {
-        sass: null,
-        mtime: null
-      };
+  return _.last(req.path.split('.')) === 'css';
+}
 
-      if (done) done();
-    };
-  };
+/**
+ * Handles building a flags string
+ */
+function buildFlagsString(opts) {
 
-  var getSassFunction = function(fullPath, cssPath, done) {
-    return function(err, stats) {
-      cache[cssPath].sass = fullPath;
-      cache[cssPath].mtime = stats.mtime.getTime();
+  // Test that we're passing an object of options, if we've passed anything
+  if (typeof opts !== 'undefined' && typeof opts !== 'object' || _.isArray(opts)) {
+    throw new InvalidArgumentException('opts should be an object');
+  }
 
-      if (done) done();
-    };
-  };
+  // If we've not passed anything, make our options a blank dictionairy
+  if (typeof opts === 'undefined') {
+    opts = {};
+  }
 
-  var last = function(arr) {
-    return arr[arr.length - 1];
-  };
+  // Make sure that libs is an array
+  if (typeof opts.libs !== 'undefined' && !_.isArray(opts.libs)) {
+    throw new InvalidArgumentException('libs should be of type array');
+  }
 
-  var fillInSassFiles = function() {
-    fs.readdir(path.join(opts.project, opts.sass), function(err, files) {
+  var flags = ['compile'];
 
-      var need = 0;
-      var done = 0;
+  if (opts.config_file) {
+    flags.push('-c', opts.config_file);
+  }
 
-      sassCount = 0;
+  if ('comments' in opts && !opts.comments) {
+    flags.push('--no-line-comments');
+  }
 
-      var doneFunction = function() {
-        done++;
-        sassCount++;
-      };
+  if ('relative' in opts && opts.relative) {
+    flags.push('--relative-assets');
+  }
 
-      for (var key in files) {
-        var file = files[key];
-        var parts = file.split('.');
+  if ('mode' in opts) {
+    flags.push('--output-style', opts.mode);
+  }
 
-        if (['scss', 'sass'].indexOf(last(parts)) === -1) continue;
+  if ('css' in opts) {
+    flags.push('--css-dir', opts.css);
+  }
 
-        var name = last(parts[0].split('/'));
-        var fullPath = path.join(path.join(opts.project, opts.sass), file);
-        var cssPath = path.join(path.join(opts.project, opts.css), name) + '.css';
+  if ('sass' in opts) {
+    flags.push('--sass-dir', opts.sass);  
+  }
 
-        if (!cache[cssPath]) continue;
+  if ('img' in opts) {
+    flags.push('--images-dir', opts.img);
+  }
 
-        need++;
+  if ('import_path' in opts) {
+    flags.push('-I', opts.import_path);
+  }
 
-        fs.stat(fullPath, getSassFunction(fullPath, cssPath, doneFunction));
-      }
-
-      (function waiting() {
-        if (done < need) return setTimeout(waiting, 1);
-      })();
+  // Add each of our libs to the flags
+  if ('libs' in opts) {
+    opts.libs.forEach(function(lib){
+      flags.push('-r', lib);
     });
-  };
+  }
 
+  return flags;
+}
+
+/**
+ * Handles logging compass output
+ */
+function handleLogging(compass) {
+  compass.stdout.setEncoding('utf8');
+  compass.stdout.on('data', function (data) {
+    console.log(data);
+  });
+
+  compass.stderr.setEncoding('utf8');
+  compass.stderr.on('data', function (data) {
+    if (!data.match(/^\u001b\[\d+m$/)) {
+      console.error('\u001b[31mstderr:\u001b[0m ' + data);
+    }
+  });
+}
+
+/**
+ * Just a dictionary for our default options
+ * @type {Object}
+ */
+var defaults = {
+
+  // The type of output mode to use
+  mode             : 'compress',
+
+  // The name of the folder to place css files
+  css              : 'stylesheets',
+
+  // The name of the folder to find sass files
+  sass             : 'stylesheets',
+
+  // The name of the folder to find images
+  img              : 'images',
+
+  // Should we cache the output
+  cache            : true,
+
+  // Should assets be found relatively?
+  relative         : true,
+
+  // Should we output logging information to the console?
+  logging          : false,
+
+  // Path to find the compass config file?
+  config_file      : false,
+
+  // Should comments be included in our output?
+  comments         : false,
+
+  // Function used to filter requests so that we only handle CSS files
+  filterRequest    : filterRequest,
+
+  // Handle building flags
+  buildFlagsString : buildFlagsString,
+
+  // Handling logging
+  handleLogging    : handleLogging,
+
+  // Names of the libraries to include
+  libs             : [],
+
+  // Where to find imports
+  import_path      : path.join(process.cwd(), 'public'),
+
+  // Path to the root of the project
+  project          : path.join(process.cwd(), 'public'),
+
+  // The command to execute for compass
+  command          : os.platform() === 'win32' ? 'compass.bat' : 'compass'
+};
+
+/**
+ * Call with your configuration options to get a middleware function
+ */
+module.exports = function(opts) {
+
+  // If we've been passed the wrong type of arguments, throw an error
+  if (
+    (typeof opts !== 'undefined' && typeof opts !== 'object') ||
+    _.isArray(opts)
+  ) {
+    throw new InvalidArgumentException('opts must be of type object');
+  }
+  // Apply our default options to our passed options
+  opts = _.extend({}, defaults, typeof opts === 'object' ? opts : {});
+
+  // Make sure filterRequest  is invokable
+  if (typeof opts.filterRequest  !== 'function') {
+    throw new InvalidArgumentException('filterRequests must be invokable');
+  }
+
+  /**
+   * Handles requests
+   */
   return function(req, res, next) {
-
-    if (last(req.path.split('.')) !== 'css') return next();
-
-    var changes = false;
-    var go = false;
-    var exit = false;
-
-    if (!opts.cache) {
-      go = true;
-    } else {
-      var getStatFunction = function(key, item, done) {
-        return function(err, stats) {
-
-          if (err) {
-            delete cache[key];
-          } else if (item.mtime !== stats.mtime.getTime()) {
-            changes = true;
-          }
-
-          if (done) done();
-        };
-      };
-
-      fs.readdir(path.join(opts.project, opts.sass), function(err, files) {
-
-        var count = 0;
-
-        if (sassCount !== null) {
-
-          for (var key in files) {
-            var file = files[key];
-
-            if (['sass', 'scss'].indexOf(last(file.split('.'))) !== -1) count++;
-          }
-        }
-
-        if (count !== sassCount) {
-          changes = true;
-          go = true;
-        } else {
-          var need = Object.keys(cache).length;
-          var done = 0;
-
-          var doneFunction = function() {
-            done++;
-          };
-
-          for (var cacheKey in cache) {
-            var item = cache[cacheKey];
-
-            try {
-              fs.stat(item.sass, getStatFunction(cacheKey, item, doneFunction));
-            } catch (e) {
-              delete cache[cacheKey];
-              doneFunction();
-            }
-          }
-
-          (function waiting() {
-            if (done < need) return setTimeout(waiting, 1);
-
-            if (!changes) {
-              exit = true;
-            } else {
-              go = true;
-            }
-          })();
-
-        }
-      });
+    // Make sure we're handling a CSS files
+    if (!opts.filterRequest(req)) {
+      return next();
     }
 
-    (function waitingForGo() {
-      if (!go) {
-        if (!exit) {
-          return setTimeout(waitingForGo, 1);
-        } else {
-          return next();
-        }
-      }
+    // Build our flags string
+    var flags = opts.buildFlagsString(opts);
 
-      cache = {};
+    // Spawn our command
+    var compass = spawn(opts.command, flags, { cwd : opts.project });
 
-      var options = [];
+    // Handle logging
+    if (opts.logging) {
+      opts.handleLogging(compass);
+    }
 
-      options.push('compile');
-
-      if (opts.config_file) { options.push('-c', opts.config_file); }
-      if (!opts.comments) { options.push('--no-line-comments'); }
-      if (opts.relative) { options.push('--relative-assets'); }
-
-      options.push('--output-style', opts.mode);
-      options.push('--css-dir', opts.css);
-      options.push('--sass-dir', opts.sass);  
-      options.push('--images-dir', opts.img);
-      options.push('-I', opts.import_path);
-      if(Array.isArray(opts.libs) && opts.libs.length){
-        opts.libs.forEach(function(lib){
-          options.push('-r', lib);
-        });
-      }
-
-      var compassExecutable = 'compass';
-      if (os.platform() === 'win32') {
-        compassExecutable += '.bat';
-      }
-
-      var compass = spawn(
-        compassExecutable,
-        options,
-        {
-          cwd: opts.project
-        }
-      );
-
-      if (opts.logging) {
-        compass.stdout.setEncoding('utf8');
-        compass.stdout.on('data', function (data) {
-          console.log(data);
-        });
-      
-        compass.stderr.setEncoding('utf8');
-        compass.stderr.on('data', function (data) {
-          if (!data.match(/^\u001b\[\d+m$/)) {
-            console.error('\u001b[31mstderr:\u001b[0m ' + data);
-          }
-        });
-      }
-
-      if (opts.cache) {
-        fs.readdir(path.join(opts.project, opts.css), function(err, files) {
-
-          var done = 0;
-
-          var doneFunction = function() {
-            done++;
-          };
-
-          var need = 0;
-
-          for (var key in files) {
-            var file = files[key];
-
-            if (last(file.split('.')) === 'css') {
-              need++;
-              var full = path.join(path.join(opts.project, opts.sass), file);
-
-              fs.readFile(full, getCSSFunction(full, doneFunction));
-            }
-          }
-
-          (function waiting() {
-            if (done < need) return setTimeout(waiting, 1);
-
-            fillInSassFiles();
-          })();
-        });
-      }
-
-      compass.on('exit', function(code) {
-        return next();
-      });
-    })();
+    // Continue to next middleware when compass is done
+    // @todo Handle bad exit codes 
+    compass.on('exit', function(code) {
+      return next();
+    });
   };
 };
+
+
+_.extend(module.exports, {
+  InvalidArgumentException : InvalidArgumentException,
+  defaults                 : defaults,
+  buildFlagsString         : buildFlagsString,
+  filterRequest            : filterRequest,
+  handleLogging            : handleLogging
+});

@@ -11,5 +11,14 @@
     "type": "git",
     "url": "https://github.com/nathggns/node-compass.git"
   },
-  "main": "index.js"
+  "main": "index.js",
+  "dependencies": {
+    "lodash": "~2.4.1",
+    "q": "~1.0.1"
+  },
+  "devDependencies": {
+    "supertest": "~0.10.0",
+    "express": "~3.5.0",
+    "should": "~3.2.0-beta1"
+  }
 }
