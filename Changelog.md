@@ -1,5 +1,11 @@
 # Changelog
 
+## Development changes
+
+ - Complete rewrite using TypeScript
+ - Allow both config files and cli options 66bb5ea39d85d89ae80c6f034125cec7588ab20e) (@jdeblank)
+ - Allow the ability to specify import path for compass files (using -I) (7f880ce42c0df447d32f05d408fe9502d22c0d41) (@fealaer)
+
 ## Version 0.2.3
 
  - Added Windows support by concatenating ".bat" to the compass spawn target if we are on Windows. (7b9e00314d80bd50b7f7c28ef6e062698de7224d) (@mpderbec)

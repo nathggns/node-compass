@@ -1,4 +1,5 @@
 node_modules
-app.js
 *.css
-test/manual
+.sass-cache
+*.tmp.txt
+src/references/*

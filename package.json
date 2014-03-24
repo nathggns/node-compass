@@ -14,11 +14,13 @@
   "main": "index.js",
   "dependencies": {
     "lodash": "~2.4.1",
-    "q": "~1.0.1"
+    "q": "~1.0.1",
+    "winston": "~0.7.2"
   },
   "devDependencies": {
-    "supertest": "~0.10.0",
     "express": "~3.5.0",
-    "should": "~3.2.0-beta1"
+    "grunt": "~0.4.4",
+    "grunt-typescript": "~0.2.10",
+    "grunt-ts": "~1.8.2"
   }
 }
