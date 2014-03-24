@@ -3,7 +3,7 @@ node-compass
 
 Compass middleware for node.js & express, built using TypeScript. Does not require TypeScript to be used.
 
-**Node Compass 1.0 is a complete internal rewrite. All efforts have been made to keep the API the same, though bugs still may appear. Update with caution*.
+**Node Compass 1.0 is a complete internal rewrite. All efforts have been made to keep the API the same, though bugs still may appear. Update with caution.**
 
 ## Requirements
 
