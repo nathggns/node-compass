@@ -12,7 +12,7 @@ function shouldHandleRequest(req) {
 exports.shouldHandleRequest = shouldHandleRequest;
 
 /**
-* Generate a middleware for serviving compiled files
+* Generate a middleware for serving compiled files
 */
 function MiddlewareFactory(options, compiler) {
     /**

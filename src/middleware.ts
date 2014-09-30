@@ -17,7 +17,7 @@ export function shouldHandleRequest(req : express.Request) : boolean {
 }
 
 /**
- * Generate a middleware for serviving compiled files
+ * Generate a middleware for serving compiled files
  */
 export function MiddlewareFactory(options : Options.Options, compiler : Compiler.Compiler) : express.Handler {
 
