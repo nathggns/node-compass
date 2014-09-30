@@ -4,3 +4,4 @@ node_modules
 *.tmp.txt
 test-compiled
 *.tmp
+.idea/workspace.xml
