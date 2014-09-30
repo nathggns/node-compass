@@ -71,7 +71,7 @@ var CompassCompiler = (function () {
         return shouldCompile.then(function (shouldCompile) {
             // If we should compile, spawnCompass
             if (shouldCompile) {
-                return _this.spawnCompass();
+                return _this.spawnCompiler(options);
             }
 
             if (options.logging) {
@@ -119,7 +119,9 @@ var CompassCompiler = (function () {
             }
 
             // Array of promises representing if each file has changed
-            var promises = _this.sassFiles.map(_this.hasChanged);
+            var promises = _this.sassFiles.map(function (entry) {
+                return entry.modified();
+            });
 
             // Promise representing if anything has changed
             return Q.all(promises).then(function (results) {
@@ -128,14 +130,7 @@ var CompassCompiler = (function () {
         });
     };
 
-    /**
-    * Alias for Files.File#modified
-    */
-    CompassCompiler.prototype.hasChanged = function (entry) {
-        return entry.modified();
-    };
-
-    CompassCompiler.prototype.spawnCompass = function (overwrites) {
+    CompassCompiler.prototype.spawnCompiler = function (overwrites) {
         var _this = this;
         if (typeof overwrites === "undefined") { overwrites = {}; }
         /**

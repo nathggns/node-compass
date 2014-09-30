@@ -91,7 +91,7 @@ export class CompassCompiler implements Compiler {
         return shouldCompile.then<number>((shouldCompile : boolean) : Q.Promise<number> => {
             // If we should compile, spawnCompass
             if (shouldCompile) {
-                return this.spawnCompass();
+                return this.spawnCompiler(options);
             }
 
             if (options.logging) {
@@ -138,7 +138,7 @@ export class CompassCompiler implements Compiler {
             }
 
             // Array of promises representing if each file has changed
-            var promises = this.sassFiles.map<Q.Promise<boolean>>(this.hasChanged);
+            var promises = this.sassFiles.map<Q.Promise<boolean>>(entry => entry.modified());
 
             // Promise representing if anything has changed
             return Q.all<boolean>(promises).then(function(results) {
@@ -147,14 +147,7 @@ export class CompassCompiler implements Compiler {
         });
     }
 
-    /**
-     * Alias for Files.File#modified
-     */
-    private hasChanged(entry : Files.File) : Q.Promise<boolean> {
-        return entry.modified();
-    }
-
-    private spawnCompass(overwrites : Object = {}) : Q.Promise<number> {
+    spawnCompiler(overwrites : Object = {}) : Q.Promise<number> {
         /**
          * Stored options extended with provided overwrites
          */
