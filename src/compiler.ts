@@ -1,3 +1,4 @@
+/// <reference path="references/tsd.d.ts" />
 import Q             = require('q');
 import child_process = require('child_process');
 import _             = require('lodash');
@@ -11,28 +12,26 @@ import Files         = require('./files');
 
 /**
  * A map of boolean flags to their name in Options.Options
- * @type {Object}
  */
-var booleanFlags = util.addIndexer({
+var booleanFlags = {
     '--no-line-comments' : 'comments',
     '--relative-assets'  : 'relative'
-});
+};
 
 /**
  * A map of string flags to their name in Options.Options
  * @type {Object}
  */
-var stringFlags = util.addIndexer({
+var stringFlags = {
     '-c'             : 'config_file',
     '-I'             : 'import_path',
     '--output-style' : 'mode',
     '--css-dir'      : 'css',
     '--sass-dir'     : 'sass',
     '--images-dir'   : 'img'
-});
+};
 
 export interface Compiler {
-
     /**
      * Runs the compile operation
      */
@@ -47,7 +46,6 @@ export class CompassCompiler implements Compiler {
 
     /**
      * Stores the options we're provided with at compile time
-     * @type {Options.Options}
      */
     private options : Options.Options;
 
@@ -63,7 +61,6 @@ export class CompassCompiler implements Compiler {
 
     /**
      * Configures the compiler with the passed options
-     * @param {Options.Options} options options to configure with
      */
     constructor(options : Options.Options, logger : Logger.Logger = null) {
 
@@ -79,12 +76,6 @@ export class CompassCompiler implements Compiler {
 
     /**
      * Compile a compass project
-     *
-     * @param  {Object}            overwrites Any overwrites to the options
-     *                                        stored on the compiler
-     * @return {Q.Promise<number>}            Promise representing the result
-     *                                        code of the compass command.
-     *                                        Returns -1 if we didn't compile
      */
     compile(overwrites : Object = {}) : Q.Promise<number> {
         /**
@@ -124,9 +115,6 @@ export class CompassCompiler implements Compiler {
 
     /**
      * Decides if we should compile the project or not based on a few conditions
-     * @param  {Object}             overwrites The overwrites you wish to apply
-     * @return {Q.Promise<boolean>}            Should we compile the project
-     *                                         or not
      */
     private shouldCompile(overwrites : Object = {}) : Q.Promise<boolean> {
 
@@ -140,8 +128,6 @@ export class CompassCompiler implements Compiler {
             return Q(true);
         }
 
-        var parent = this.getSassPath();
-
         return this.findSassFiles().then<boolean>((names : string[]) : Q.Promise<boolean> => {
 
             // If there is a different number of files then what we know about
@@ -151,20 +137,13 @@ export class CompassCompiler implements Compiler {
                 return Q(true);
             }
 
-            /**
-             * The absolute path to our Sass files
-             */
-            var files = names.map((name) => path.join(parent, name));
-
             // Array of promises representing if each file has changed
             var promises = this.sassFiles.map<Q.Promise<boolean>>(this.hasChanged);
 
             // Promise representing if anything has changed
-            var deferredHasChanged = Q.all<boolean>(promises).then(function(results) {
+            return Q.all<boolean>(promises).then(function(results) {
                 return results.indexOf(true) > -1;
             });
-
-            return deferredHasChanged;
         });
     }
 
@@ -254,8 +233,6 @@ export class CompassCompiler implements Compiler {
 
     /**
      * Convert an absolute path into an initiated file object
-     * @param  {string}                file The path to the file
-     * @return {Q.Promise<Files.File>}      The file object
      */
     private makeFile(file : string) : Q.Promise<Files.File> {
         var entry = new Files.File(file);
@@ -278,20 +255,14 @@ export class CompassCompiler implements Compiler {
 
     /**
      * Find the sass files in our project
-     * @return {Q.Promise<string[]>} An array of file names (without the location, just the file names)
      */
     private findSassFiles(overwrites : Object = {}) : Q.Promise<string[]> {
-        /**
-         * Stored options extended with provided overwrites
-         */
-        var options = this.extendOptions(overwrites);
-
         /**
          * The path for the sass folder
          */
         var parent = this.getSassPath(overwrites);
 
-        return util.findFilesWithExts(parent, ['scss', 'sass']);
+        return Q<string[]>(util.findFilesWithExts(parent, ['scss', 'sass']));
     }
 
     /**
@@ -312,24 +283,27 @@ export class CompassCompiler implements Compiler {
          */
         var flags : string[] = ['compile'];
 
-        var name : string;
-        var flag : string;
+        var flag;
 
         // Loop through our booleanFlags and append them to our flags array
         for (flag in booleanFlags) {
-            name = booleanFlags[flag];
+            if (!Object.prototype.hasOwnProperty.call(booleanFlags, flag)) {
+                return;
+            }
 
-            if (options[name]) {
+            if (options[booleanFlags[flag]]) {
                 flags.push(flag);
             }
         }
 
         // Loop through our string flags and append them to our flags array
         for (flag in stringFlags) {
-            name = stringFlags[flag];
+            if (!Object.prototype.hasOwnProperty.call(stringFlags, flag)) {
+                return;
+            }
 
-            if (options[name]) {
-                flags.push(flag, options[name]);
+            if (options[stringFlags[flag]]) {
+                flags.push(flag, options[stringFlags[flag]]);
             }
         }
 

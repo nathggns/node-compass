@@ -1,4 +1,8 @@
+/// <reference path="references/tsd.d.ts" />
 
+/**
+* A class that implements the logger interface, but does nothing
+*/
 var FakeLogger = (function () {
     function FakeLogger() {
     }

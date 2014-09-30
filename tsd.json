@@ -2,8 +2,7 @@
   "version": "v4",
   "repo": "borisyankov/DefinitelyTyped",
   "ref": "master",
-  "path": "src/references",
-  "bundle": "src/references/tsd.d.ts",
+  "path": "src/references/tsd",
   "installed": {
     "express/express.d.ts": {
       "commit": "486d47c1a5721468ef8bbd9d2395b813678b2bb0"
@@ -16,6 +15,12 @@
     },
     "jquery/jquery.d.ts": {
       "commit": "486d47c1a5721468ef8bbd9d2395b813678b2bb0"
+    },
+    "should/should.d.ts": {
+      "commit": "2c52e529f9694028e02445c4fe046eda732acd49"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "2c52e529f9694028e02445c4fe046eda732acd49"
     }
   }
 }

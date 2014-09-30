@@ -1,5 +1,6 @@
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-ts');
+    grunt.loadNpmTasks('grunt-mocha-test');
 
     grunt.initConfig({
         pkg : grunt.file.readJSON('package.json'),
@@ -15,13 +16,30 @@ module.exports = function(grunt) {
 
             dev : {
                 src    : ['src/**/*.ts'],
-                outDir : 'dist'
+                outDir : 'src'
+            },
+
+            test : {
+                src    : ['test/**/*.ts'],
+                outDir : 'test'
+            },
+
+            testWatch : {
+                src    : ['test/**/*.ts'],
+                outDir : 'test',
+                watch  : 'test'
             },
 
             watch : {
                 src    : ['src/**/*.ts'],
-                outDir : 'dist',
+                outDir : 'src',
                 watch  : 'src'
+            }
+        },
+
+        mochaTest : {
+            test : {
+                src : ['test/test/**/*.js']
             }
         }
     });
@@ -29,4 +47,5 @@ module.exports = function(grunt) {
     grunt.registerTask('build',   ['ts:dev']);
     grunt.registerTask('watch',   ['ts:watch']);
     grunt.registerTask('default', ['build']);
+    grunt.registerTask('test',    ['ts:test', 'mochaTest:test']);
 };

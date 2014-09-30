@@ -1,3 +1,5 @@
+/// <reference path="references/tsd.d.ts" />
+
 import os   = require('os');
 import path = require('path');
 import _    = require('lodash');

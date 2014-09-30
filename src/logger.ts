@@ -1,3 +1,5 @@
+/// <reference path="references/tsd.d.ts" />
+
 /**
  * An interface for a simple logger. 
  */

@@ -1,1 +1,1 @@
-module.exports = require('./dist/compass').HandlerFactory;
+module.exports = require('./src/compass').HandlerFactory;

@@ -1,0 +1,32 @@
+<component name="libraryTable">
+  <library name="Generated files" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/src/options.js" />
+        <item url="file://$PROJECT_DIR$/src/logger.js" />
+        <item url="file://$PROJECT_DIR$/src/middleware.js" />
+        <item url="file://$PROJECT_DIR$/src/compass.js" />
+        <item url="file://$PROJECT_DIR$/test/files.js" />
+        <item url="file://$PROJECT_DIR$/test/util/promise.js" />
+        <item url="file://$PROJECT_DIR$/src/compiler.js" />
+        <item url="file://$PROJECT_DIR$/test/boot.js" />
+        <item url="file://$PROJECT_DIR$/src/files.js" />
+        <item url="file://$PROJECT_DIR$/src/util.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/src/options.js" />
+      <root url="file://$PROJECT_DIR$/src/logger.js" />
+      <root url="file://$PROJECT_DIR$/src/middleware.js" />
+      <root url="file://$PROJECT_DIR$/src/compass.js" />
+      <root url="file://$PROJECT_DIR$/test/util/promise.js" />
+      <root url="file://$PROJECT_DIR$/test/files.js" />
+      <root url="file://$PROJECT_DIR$/test/boot.js" />
+      <root url="file://$PROJECT_DIR$/src/compiler.js" />
+      <root url="file://$PROJECT_DIR$/src/files.js" />
+      <root url="file://$PROJECT_DIR$/src/util.js" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

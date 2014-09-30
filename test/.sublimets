@@ -1,9 +1,9 @@
 {
-    "root" : "src/compass.ts",
+    "root" : "./boot.ts",
     "settings" : {
        "auto_complete"      : true,
        "node_path"          : "none",
-       "error_on_save_only" : false,
+       "error_on_save_only" : true,
        "build_on_save"      : false,
        "show_build_file"    : false,
 

@@ -15,19 +15,32 @@ declare module Q {
     interface Deferred<T> {
         promise: Promise<T>;
         resolve(value: T): void;
+        resolve(value: Promise<T>) : void;
         reject(reason: any): void;
         notify(value: any): void;
         makeNodeResolver(): (reason: any, value: T) => void;
     }
 
+    interface IPromise<T> {
+        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason: any) => IPromise<U>): IPromise<U>;
+        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason: any) => U): IPromise<U>;
+        then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => IPromise<U>): IPromise<U>;
+        then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => U): IPromise<U>;
+    }
+
+
     interface Promise<T> {
         fin(finallyCallback: () => any): Promise<T>;
         finally(finallyCallback: () => any): Promise<T>;
 
+        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason: any) => IPromise<U>, onProgress?: Function): Promise<U>;
+        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason: any) => U          , onProgress?: Function): Promise<U>;
+        then<U>(onFulfill: (value: T) => U          , onReject?: (reason: any) => IPromise<U>, onProgress?: Function): Promise<U>;
+        then<U>(onFulfill: (value: T) => U          , onReject?: (reason: any) => U          , onProgress?: Function): Promise<U>;
+
         then<U>(onFulfill: (value: T) => Promise<U>, onReject?: (reason: any) => Promise<U>, onProgress?: Function): Promise<U>;
-        then<U>(onFulfill: (value: T) => Promise<U>, onReject?: (reason: any) => U, onProgress?: Function): Promise<U>;
-        then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => Promise<U>, onProgress?: Function): Promise<U>;
-        then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => U, onProgress?: Function): Promise<U>;
+        then<U>(onFulfill: (value: T) => Promise<U>, onReject?: (reason: any) => U         , onProgress?: Function): Promise<U>;
+        then<U>(onFulfill: (value: T) => U         , onReject?: (reason: any) => Promise<U>, onProgress?: Function): Promise<U>;
 
         spread<U>(onFulfilled: Function, onRejected?: Function): Promise<U>;
 
@@ -62,6 +75,8 @@ declare module Q {
         valueOf(): any;
 
         inspect(): PromiseState<T>;
+
+        nodeify(callback: (err : Error, value ?: T) => any) : Promise<T>;
     }
 
     interface PromiseState<T> {
