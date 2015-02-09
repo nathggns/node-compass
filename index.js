@@ -64,22 +64,21 @@ module.exports = exports = function(opts) {
         sassCount++;
       };
 
-      for (var key in files) {
-        var file = files[key];
+      files.forEach(function(file, key) {
         var parts = file.split('.');
 
-        if (['scss', 'sass'].indexOf(last(parts)) === -1) continue;
+        if (['scss', 'sass'].indexOf(last(parts)) === -1) return;
 
         var name = last(parts[0].split('/'));
         var fullPath = path.join(path.join(opts.project, opts.sass), file);
         var cssPath = path.join(path.join(opts.project, opts.css), name) + '.css';
 
-        if (!cache[cssPath]) continue;
+        if (!cache[cssPath]) return;
 
         need++;
 
         fs.stat(fullPath, getSassFunction(fullPath, cssPath, doneFunction));
-      }
+      });
 
       (function waiting() {
         if (done < need) return setTimeout(waiting, 1);
@@ -112,6 +111,14 @@ module.exports = exports = function(opts) {
       };
 
       fs.readdir(path.join(opts.project, opts.sass), function(err, files) {
+
+        if (err) {
+          console.warn('node-compass: Project directory not found (SASS)');
+
+          exit = true;
+
+          return;
+        }
 
         var count = 0;
 
@@ -222,6 +229,12 @@ module.exports = exports = function(opts) {
       if (opts.cache) {
         fs.readdir(path.join(opts.project, opts.css), function(err, files) {
 
+          if (err) {
+            console.warn('node-compass: Project directory not found (CSS)');
+
+            return;
+          }
+
           var done = 0;
 
           var doneFunction = function() {
@@ -230,16 +243,14 @@ module.exports = exports = function(opts) {
 
           var need = 0;
 
-          for (var key in files) {
-            var file = files[key];
-
+          files.forEach(function(file, key) {
             if (last(file.split('.')) === 'css') {
               need++;
               var full = path.join(path.join(opts.project, opts.sass), file);
 
               fs.readFile(full, getCSSFunction(full, doneFunction));
             }
-          }
+          });
 
           (function waiting() {
             if (done < need) return setTimeout(waiting, 1);

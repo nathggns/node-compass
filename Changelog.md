@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.4
+
+ - Added a descriptive error message for when directories don't exist. (https://github.com/nathggns/node-compass/issues/36) (@nathggns, @wind-rider)
+
 ## Version 0.2.3
 
  - Added Windows support by concatenating ".bat" to the compass spawn target if we are on Windows. (7b9e00314d80bd50b7f7c28ef6e062698de7224d) (@mpderbec)
