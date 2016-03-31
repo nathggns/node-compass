@@ -211,6 +211,13 @@ module.exports = exports = function(opts) {
           cwd: opts.project
         }
       );
+      
+      compass.on('error', function (err) {
+        if (err.code === 'ENOENT') {
+          console.error("node-compass: Compass executable not found. Please install compass.");
+        }
+        throw(err);
+      });
 
       if (opts.logging) {
         compass.stdout.setEncoding('utf8');
