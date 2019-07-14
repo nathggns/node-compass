@@ -55,55 +55,48 @@ compass({
 
 #### mode
 
-**default:** compress
-
-**description:** The output mode you wish to use.
-Can be expanded, nested, compressed or compact.
+ - **default:** compress
+ - **description:** The output mode you wish to use. Can be expanded, nested, compressed
+   or compact.
 
 #### comments
 
-**default:** false
-
-**description:** Show line comments or not.
+ - **default:** false
+ - **description:** Show line comments or not.
 
 #### relative
 
-**default:** true
-
-**description:** Are assets relative.
+ - **default:** true
+ - **description:** Are assets relative.
 
 #### css
 
-**default:** stylesheets
-
-**description:** The folder inside the project to output css into.
+ - **default:** stylesheets
+ - **description:** The folder inside the project to output css into.
 
 #### sass
 
-**default:** stylesheets
-
-**description:** The folder inside the project to find sass in.
+ - **default:** stylesheets
+ - **description:** The folder inside the project to find sass in.
 
 #### project
 
-**default:** public
-
-**description:** The location where all your assets are store.
+ - **default:** public
+ - **description:** The location where all your assets are store.
 
 #### cache
 
-**default:** true
-
-**description:** enable/disable caching.
+ - **default:** true
+ - **description:** enable/disable caching.
 
 #### logging
 
-**default:** false
-
-**description:** Enable/disables logging to terminal when attempting to compile sass files.
+ - **default:** false
+ - **description:** Enable/disables logging to terminal when attempting to compile sass
+   files.
 
 #### config_file
 
-**default:** false
-
-**description:** Use this config option to point to a valid compass `config.rb` file, if you would prefer to use that for your config instead.
+ - **default:** false
+ - **description:** Use this config option to point to a valid compass `config.rb` file,
+   if you would prefer to use that for your config instead.
